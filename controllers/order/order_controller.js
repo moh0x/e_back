@@ -85,6 +85,50 @@ const addOrder = async(req,res)=>{
      res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"});
     }
  }
+const getMySummary = async(req,res)=>{
+   try {
+    var token =  req.headers.token;
+    const orders = await Order.find({orderStatusId:"finished"}); 
+    var orderRet = [];
+    var all = 0;
+    var allWithoutShiping = 0 ;
+    var shipping = 0;
+    var myFreeShipping = 0;
+    var myFreeallWithoutShiping = 0;
+    var shippingMoney = 0;
+    var allWithoutShipingMoney = 0;
+    var myAllFree = 0;
+    var allMoney = 0;
+    for (let index = 0; index < orders.length; index++) {
+        allWithoutShiping =  allWithoutShiping + orders[index].orderPrice;
+        shipping = shipping + orders[index].orderShiping;
+           
+    }
+    all = allWithoutShiping + shipping;
+    myFreeShipping = shipping * (10/100);
+    myFreeallWithoutShiping = allWithoutShiping * (14/100);
+    shippingMoney = shipping - myFreeShipping;
+    allWithoutShipingMoney = allWithoutShiping - myFreeallWithoutShiping;
+    myAllFree = myFreeallWithoutShiping + myFreeShipping;
+    allMoney = all - myAllFree;
+       res.status(200).json({"status":httpsStatus.SUCCESS,"data":{
+        "all":all,
+        "vendor":allWithoutShiping,
+        "shipping":shipping,
+        "vendorMoney":allWithoutShipingMoney,
+        "shippingMoney":shippingMoney,
+        "allMoney":allMoney,
+        "myEarnVendor":myFreeallWithoutShiping,
+        "myEarnShipping":myFreeShipping,
+        "myAllFree":myAllFree
+
+       }}); 
+   } catch (error){
+     console.log(error);
+    res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"});
+   }
+
+  }
  module.exports = {
-    getMyOrders,addOrder,deleteOrder
+    getMyOrders,addOrder,deleteOrder,getMySummary
    }
