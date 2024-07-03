@@ -32,6 +32,18 @@ const orderSchema = new mongoose.Schema({
         minLength:3,
         maxLength:30
     },
+    orderVendorId:{
+        type:String,
+        required:true,
+        minLength:3,
+        maxLength:30
+    },
+    orderDeliviryId:{
+        type:String,
+        required:true,
+        minLength:3,
+        maxLength:30
+    },
     orderStatusId:{
         type:String,
         required:true,
@@ -45,6 +57,10 @@ const orderSchema = new mongoose.Schema({
         maxLength:30
     },
     orderShiping:{
+        type:Number,
+        required:true,
+    },
+    orderPrice:{
         type:Number,
         required:true,
     },
