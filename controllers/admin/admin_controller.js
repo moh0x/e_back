@@ -31,7 +31,7 @@ if (valid.isEmpty()) {
                 token:token
              }});
              await add.save();
-             res.status(200).json({"status":httpsStatus.SUCCESS,"data":adminRet});       
+             res.status(200).json({"status":httpsStatus.SUCCESS,"data":add});       
      } else {
          res.status(400).json({"status":httpsStatus.FAIL,"data":null,"message":"password not match"});
      }
