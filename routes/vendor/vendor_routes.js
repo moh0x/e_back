@@ -16,7 +16,7 @@ router.post('/sendResetCode',vendorControoler.sendResetCodeFunc);
 router.get('/admin/getAllVendorsAgreeAdmin',verifyToken,verifyAdmin,vendorControoler.getAllVendorsAgreeAdmin);
 router.get('/admin/getAllVendorsNotAgreeAdmin',verifyToken,verifyAdmin,vendorControoler.getAllVendorsNotAgreeAdmin);
 router.patch('/admin/changeStatusAgree',verifyToken,verifyAdmin,vendorControoler.changeVendorStatusAdmin);
-router.delete('/admin/deleteVendors',verifyToken,verifyAdmin,vendorControoler.deletevendorAdmin);
+router.delete('/admin/deleteVendor',verifyToken,verifyAdmin,vendorControoler.deletevendorAdmin);
   module.exports = 
     router
   
