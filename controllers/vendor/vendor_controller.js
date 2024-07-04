@@ -34,9 +34,11 @@ const registerFunc = async(req,res)=>{
              phone:req.body.phone,
              verifyCode:verifyCode,
      resetPasswordCode:0,
-     isAgree:false,
-             
+     isAgree:false,        
              isVerify:false,
+             sales:0,
+             salesTax:0,
+             myFreeSales:0
      });
          await vendor.save();
          const newVendor= await Vendor.findOne({email : req.body.email},{__v:false,password:false});
@@ -213,31 +215,9 @@ const getAllVendorsAgreeAdmin =  async(req,res)=>{
     const limit = 15;
     const page = req.body.page || 1;
     const skip = (page - 1) * limit;
-    const vendors = await Vendor.find({isAgree:true}).limit(limit).skip(skip);
-    const vendorsIds = [];
-    for (let index = 0; index < vendors.length; index++) {
-      vendorsIds.unshift(vendors[index].id);  
-    }
-    const orders = await Order.find({orderStatusId:"finished",orderVendorId:{$in:vendorsIds}}); 
-    var sale = 0;
-    var myFreesale = 0;
-    var saleTax = 0;
-    const result = [];
-    for (let index = 0; index < vendors.length; index++) {
-        for (let ind = 0; ind < orders.length; ind++) {
-            sale = sale + orders[ind].orderPrice;       
-        }
-       saleTax = sale * (14/100);
-       myFreesale = sale - saleTax;
-        result.unshift({
-            "vendor":vendors[index],
-            "myEarn":sale.toFixed(),
-            "myTax":saleTax.toFixed(),
-            "myFreeEarn":myFreesale.toFixed()
-        })
-        
-    }
-   res.status(200).json({"status":httpsStatus.SUCCESS,"data":result}); 
+    const vendors = await Vendor.find({isAgree:true},{password:false,token:false}).limit(limit).skip(skip);
+   
+   res.status(200).json({"status":httpsStatus.SUCCESS,"data":vendors}); 
    } catch (error) {
     console.log(error);
     res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"
@@ -249,31 +229,9 @@ const getAllVendorsNotAgreeAdmin =  async(req,res)=>{
     const limit = 15;
     const page = req.body.page || 1;
     const skip = (page - 1) * limit;
-    const vendors = await Vendor.find({isAgree:false}).limit(limit).skip(skip);
-    const vendorsIds = [];
-    for (let index = 0; index < vendors.length; index++) {
-      vendorsIds.unshift(vendors[index].id);  
-    }
-    const orders = await Order.find({orderStatusId:"finished",orderVendorId:{$in:vendorsIds}}); 
-    var sale = 0;
-    var myFreesale = 0;
-    var saleTax = 0;
-    const result = [];
-    for (let index = 0; index < vendors.length; index++) {
-        for (let ind = 0; ind < orders.length; ind++) {
-            sale = sale + orders[ind].orderPrice;       
-        }
-       saleTax = sale * (14/100);
-       myFreesale = sale - saleTax;
-        result.unshift({
-            "vendor":vendors[index],
-            "myEarn":sale.toFixed(),
-            "myTax":saleTax.toFixed(),
-            "myFreeEarn":myFreesale.toFixed()
-        })
-        
-    }
-   res.status(200).json({"status":httpsStatus.SUCCESS,"data":result}); 
+    const vendors = await Vendor.find({isAgree:false},{password:false,token:false}).limit(limit).skip(skip);
+    
+   res.status(200).json({"status":httpsStatus.SUCCESS,"data":vendors}); 
    } catch (error) {
     res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"
     }); 
