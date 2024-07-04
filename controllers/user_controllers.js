@@ -118,7 +118,7 @@ if (valid.isEmpty()) {
 }
 const sendResetCodeFunc = async(req,res)=>{
   try {
-   const user = await User.findOne({email:req.body.email},{__v:false,password:false});
+   const user = await User.findOne({email:req.body.email},{__v:false,password:false,token:false});
    if (user) {
                const resetPasswordCode = gen(5,"0123456789");
            await    User.findByIdAndUpdate(user._id,{
@@ -151,7 +151,7 @@ const sendResetCodeFunc = async(req,res)=>{
 const resetPasswordFunc = async(req,res)=>{
   try {     
       const email = req.body.email;
-      const user = await User.findOne({email:email},{__v:false,password:false});
+      const user = await User.findOne({email:email},{__v:false,password:false,token:false});
       const resetPasswordCode = req.body.resetPasswordCode;
       const password =await bcrypt.hash(req.body.password,10);
 if (user) {
@@ -180,7 +180,7 @@ if (resetPasswordCode == user.resetPasswordCode && user.resetPasswordCode != 0 )
 const confirmAccountFunc = async(req,res)=>{
   try {     
       const token = req.headers.token;
-      const user = await User.findOne({token:token},{__v:false,password:false});
+      const user = await User.findOne({token:token},{__v:false,password:false,token:false});
       const verifyCode = req.body.verifyCode;
 if (user) {
 if (verifyCode == user.verifyCode && user.verifyCode != 0 ) {
@@ -204,6 +204,33 @@ if (verifyCode == user.verifyCode && user.verifyCode != 0 ) {
    
   }
 }
+const getAllUsersAdmin = async(req,res)=>{
+  try {
+    const limit = 15;
+    const page = req.body.page || 1;
+    const skip = (page - 1) * limit;
+   const users = await User.find({},{password:false,token:false}).limit(limit).skip(skip);  
+       res.status(200).json({"status":httpsStatus.SUCCESS,"data":users});
+   
+  } catch (error) {
+   res.status(400).json({"status":httpsStatus.ERROR,"message":"error"});
+  }
+}
+const deleteUserAdmin = async(req,res)=>{
+  try {
+    const userId = req.body.userId;
+    const userSer = await User.findById(userId);
+  if (userSer) {
+  const user = await User.findByIdAndDelete(userId);
+  res.status(200).json({"status":httpsStatus.SUCCESS});
+  } else {
+    res.status(400).json({"status":httpsStatus.FAIL,"data":null,"message":"no user"});
+  }
+ } catch (error){
+  res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"});
+ }
+
+}
  module.exports = {
-  registerFunc,loginFunc,sendResetCodeFunc,resetPasswordFunc,confirmAccountFunc,getUserInfo
+  registerFunc,loginFunc,sendResetCodeFunc,resetPasswordFunc,confirmAccountFunc,getUserInfo,getAllUsersAdmin,deleteUserAdmin
  }
