@@ -45,7 +45,18 @@ const vendorSchema = new mongoose.Schema({
     isAgree:{
         type:Boolean,
         default:false
-    }
+    },
+    sales:{
+        type:Number,
+        required:true,
+        default:0
+    },
+    salesTax:{ type:Number,
+        required:true,
+        default:0},
+    myFreeSales:{ type:Number,
+        required:true,
+        default:0}
 });
 const Vendor = mongoose.model("Vendor",vendorSchema);
 module.exports = {Vendor};
