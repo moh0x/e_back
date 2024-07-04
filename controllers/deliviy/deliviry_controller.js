@@ -36,8 +36,11 @@ const registerFunc = async(req,res)=>{
              verifyCode:verifyCode,
      resetPasswordCode:0,
      isAgree:false,
+     isVerify:false,
+     shipping:0,
+     shippingTax:0,
+     myFreeShipping:0, 
              
-             isVerify:false,
      });
          await deliviry.save();
          const newDeliviry = await Deliviry.findOne({email : req.body.email},{__v:false,password:false});
@@ -213,32 +216,9 @@ const getAllDeliviriesAgreeAdmin =  async(req,res)=>{
     const limit = 15;
     const page = req.body.page || 1;
     const skip = (page - 1) * limit;
-    const deliviries = await Deliviry.find({isAgree:true}).limit(limit).skip(skip);
-    const deliviriesIds = [];
-    for (let index = 0; index < deliviries.length; index++) {
-        deliviriesIds.unshift(deliviries[index].id);  
-    }
-    const orders = await Order.find({orderStatusId:"finished",orderDeliviryId:{$in:deliviriesIds}}); 
-    var shipping = 0;
-    var myFreeShipping = 0;
-    var shippingTax = 0;
-    const result = [];
-    for (let index = 0; index < deliviries.length; index++) {
-        for (let ind = 0; ind < orders.length; ind++) {
-            shipping = shipping + orders[ind].orderShiping       
-        }
-       shippingTax = shipping * (10/100);
-       myFreeShipping = shipping - shippingTax;
-        result.unshift({
-            "deliviry":deliviries[index],
-            "myEarn":shipping.toFixed(),
-            "myTax":shippingTax.toFixed(),
-            "myFreeEarn":myFreeShipping.toFixed()
-        })
-        
-    }
-   res.status(200).json({"status":httpsStatus.SUCCESS,"data":result
-}); 
+    const deliviries = await Deliviry.find({isAgree:true},{token:false,password:false}).limit(limit).skip(skip);
+    res.status(200).json({"status":httpsStatus.SUCCESS,"data":deliviries}); 
+
    } catch (error) {
     res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"
     }); 
@@ -249,32 +229,8 @@ const getAllDeliviriesNotAgreeAdmin =  async(req,res)=>{
      const limit = 15;
      const page = req.body.page || 1;
      const skip = (page - 1) * limit;
-     const deliviries = await Deliviry.find({isAgree:false}).limit(limit).skip(skip);
-     const deliviriesIds = [];
-     for (let index = 0; index < deliviries.length; index++) {
-         deliviriesIds.unshift(deliviries[index].id);  
-     }
-     const orders = await Order.find({orderStatusId:"finished",orderDeliviryId:{$in:deliviriesIds}}); 
-     var shipping = 0;
-     var myFreeShipping = 0;
-     var shippingTax = 0;
-     const result = [];
-     for (let index = 0; index < deliviries.length; index++) {
-         for (let ind = 0; ind < orders.length; ind++) {
-             shipping = shipping + orders[ind].orderShiping       
-         }
-        shippingTax = shipping * (10/100);
-        myFreeShipping = shipping - shippingTax;
-         result.unshift({
-             "deliviry":deliviries[index],
-             "myEarn":shipping.toFixed(),
-             "myTax":shippingTax.toFixed(),
-             "myFreeEarn":myFreeShipping.toFixed()
-         })
-         
-     }
-    res.status(200).json({"status":httpsStatus.SUCCESS,"data":result
- }); 
+     const deliviries = await Deliviry.find({isAgree:false},{token:false,password:false}).limit(limit).skip(skip);
+    res.status(200).json({"status":httpsStatus.SUCCESS,"data":deliviries}); 
     } catch (error) {
      res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"
      }); 
