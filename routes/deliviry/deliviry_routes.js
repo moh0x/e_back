@@ -21,3 +21,4 @@ router.delete('/admin/deleteDeliviry',verifyToken,verifyAdmin,deliviryControoler
   module.exports = 
     router
   
+  
