@@ -11,6 +11,6 @@ router.get('/getLatestItem',verifyToken,itemsControoler.getLatestItems);
 router.get('/admin/getLatestItemItemsVerify',verifyToken,verifyAdmin,itemsControoler.getLatestItemsVerifyAdmin);
 router.get('/admin/getLatestItemItemsNotVerify',verifyToken,verifyAdmin,itemsControoler.getLatestItemsNotVerifyAdmin);
 router.delete('/admin/deleteItem',verifyToken,verifyAdmin,itemsControoler.deleteItemAdmin);
-router.get('/admin/changeStatusVerify',verifyToken,itemsControoler.changeItemStatusAdmin);
+router.patch('/admin/changeStatusVerify',verifyToken,itemsControoler.changeItemStatusAdmin);
 module.exports = 
 router
