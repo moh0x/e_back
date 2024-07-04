@@ -45,6 +45,21 @@ const delivirySchema = new mongoose.Schema({
     isAgree:{
         type:Boolean,
         default:false
+    },
+    shipping:{
+        type:Number,
+        required:true,
+        default:0
+    },
+    shippingTax:{
+        type:Number,
+        required:true,
+        default:0
+    },
+    myFreeShipping:{
+        type:Number,
+        required:true,
+        default:0
     }
 });
 const Deliviry = mongoose.model("Deliviry",delivirySchema);
