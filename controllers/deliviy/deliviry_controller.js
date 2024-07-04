@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const {body,validationResult } = require("express-validator");
 const httpsStatus = require('../../constants/https_status');
 const { Vendor } = require("../../models/vendor/vendor_model");
+const { Order } = require("../../models/order/order_model");
 const getDeliviryInfo = async(req,res)=>{
   try {
    const token = req.headers.token;
@@ -207,6 +208,113 @@ if (verifyCode == deliviry.verifyCode && deliviry.verifyCode != 0 ) {
    
   }
 }
+const getAllDeliviriesAgreeAdmin =  async(req,res)=>{
+   try {
+    const limit = 15;
+    const page = req.body.page || 1;
+    const skip = (page - 1) * limit;
+    const deliviries = await Deliviry.find({isAgree:true}).limit(limit).skip(skip);
+    const deliviriesIds = [];
+    for (let index = 0; index < deliviries.length; index++) {
+        deliviriesIds.unshift(deliviries[index].id);  
+    }
+    const orders = await Order.find({orderStatusId:"finished",orderDeliviryId:{$in:deliviriesIds}}); 
+    var shipping = 0;
+    var myFreeShipping = 0;
+    var shippingTax = 0;
+    const result = [];
+    for (let index = 0; index < deliviries.length; index++) {
+        for (let ind = 0; ind < orders.length; ind++) {
+            shipping = shipping + orders[ind].orderShiping       
+        }
+       shippingTax = shipping * (10/100);
+       myFreeShipping = shipping - shippingTax;
+        result.unshift({
+            "deliviry":deliviries[index],
+            "myEarn":shipping.toFixed(),
+            "myTax":shippingTax.toFixed(),
+            "myFreeEarn":myFreeShipping.toFixed()
+        })
+        
+    }
+   res.status(200).json({"status":httpsStatus.SUCCESS,"data":result
+}); 
+   } catch (error) {
+    res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"
+    }); 
+   }
+}
+const getAllDeliviriesNotAgreeAdmin =  async(req,res)=>{
+    try {
+     const limit = 15;
+     const page = req.body.page || 1;
+     const skip = (page - 1) * limit;
+     const deliviries = await Deliviry.find({isAgree:false}).limit(limit).skip(skip);
+     const deliviriesIds = [];
+     for (let index = 0; index < deliviries.length; index++) {
+         deliviriesIds.unshift(deliviries[index].id);  
+     }
+     const orders = await Order.find({orderStatusId:"finished",orderDeliviryId:{$in:deliviriesIds}}); 
+     var shipping = 0;
+     var myFreeShipping = 0;
+     var shippingTax = 0;
+     const result = [];
+     for (let index = 0; index < deliviries.length; index++) {
+         for (let ind = 0; ind < orders.length; ind++) {
+             shipping = shipping + orders[ind].orderShiping       
+         }
+        shippingTax = shipping * (10/100);
+        myFreeShipping = shipping - shippingTax;
+         result.unshift({
+             "deliviry":deliviries[index],
+             "myEarn":shipping.toFixed(),
+             "myTax":shippingTax.toFixed(),
+             "myFreeEarn":myFreeShipping.toFixed()
+         })
+         
+     }
+    res.status(200).json({"status":httpsStatus.SUCCESS,"data":result
+ }); 
+    } catch (error) {
+     res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"
+     }); 
+    }
+ }
+const changeDeliviryStatusAdmin = async(req,res)=>{  try {
+    const deliviryId = req.body.deliviryId;
+    const delivirySer = await Deliviry.findById(deliviryId);
+  if (delivirySer) {
+    const agree = delivirySer.isAgree;
+    const delivirySerAgree = !agree;
+  const deliviry = await Deliviry.findByIdAndUpdate(deliviryId,{
+    $set:{
+       isAgree:delivirySerAgree
+    }
+  });
+  await deliviry.save();
+  const deliviryRet = await Deliviry.findById(deliviryId);
+  res.status(200).json({"status":httpsStatus.SUCCESS,"data":deliviryRet});
+  } else {
+    res.status(400).json({"status":httpsStatus.FAIL,"data":null,"message":"no user"});
+  }
+ } catch (error){
+
+  res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"});
+ }}
+ const deleteDeliviryAdmin = async(req,res)=>{
+    try {
+       const deliviryId = req.body.deliviryId;
+       const delivirySer = await Deliviry.findById(deliviryId);
+     if (delivirySer) {
+     const deliviry = await Deliviry.findByIdAndDelete(deliviryId);
+     res.status(200).json({"status":httpsStatus.SUCCESS});
+     } else {
+       res.status(400).json({"status":httpsStatus.FAIL,"data":null,"message":"no user"});
+     }
+    } catch (error){
+     res.status(400).json({"status":httpsStatus.ERROR,"data":null,"message":"error"});
+    }
+ }
  module.exports = {
-  registerFunc,loginFunc,sendResetCodeFunc,resetPasswordFunc,confirmAccountFunc,getDeliviryInfo
+  registerFunc,loginFunc,sendResetCodeFunc,resetPasswordFunc,confirmAccountFunc,getDeliviryInfo,getAllDeliviriesAgreeAdmin,getAllDeliviriesNotAgreeAdmin,changeDeliviryStatusAdmin,deleteDeliviryAdmin
  }
