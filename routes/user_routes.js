@@ -14,7 +14,8 @@ router.patch('/resetPassword',body("resetPasswordCode").isString().isLength({min
 router.post('/login',body("email").isEmail().isLength({min:6,max:50}).withMessage("type valid email"),body("password").isString().isLength({min:8,max:30}).withMessage("type valid password"),userControoler.loginFunc);
   
 router.post('/sendResetCode',userControoler.sendResetCodeFunc);
-router.get('/admin/getAllUsers',verifyToken,verifyAdmin,userControoler.getAllUsersAdmin)
+router.get('/admin/getAllUsersVerify',verifyToken,verifyAdmin,userControoler.getAllUsersVerifyAdmin)
+router.get('/admin/getAllUsersNotVerify',verifyToken,verifyAdmin,userControoler.getAllUsersNotVerifyAdmin)
 router.delete('/admin/deleteUser',verifyToken,verifyAdmin,userControoler.deleteUserAdmin)
   module.exports = 
     router
