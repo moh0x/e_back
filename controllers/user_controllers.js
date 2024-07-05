@@ -204,12 +204,24 @@ if (verifyCode == user.verifyCode && user.verifyCode != 0 ) {
    
   }
 }
-const getAllUsersAdmin = async(req,res)=>{
+const getAllUsersVerifyAdmin = async(req,res)=>{
   try {
     const limit = 15;
     const page = req.body.page || 1;
     const skip = (page - 1) * limit;
-   const users = await User.find({},{password:false,token:false}).limit(limit).skip(skip);  
+   const users = await User.find({isVerify:true},{password:false,token:false}).limit(limit).skip(skip);  
+       res.status(200).json({"status":httpsStatus.SUCCESS,"data":users});
+   
+  } catch (error) {
+   res.status(400).json({"status":httpsStatus.ERROR,"message":"error"});
+  }
+}
+const getAllUsersNotVerifyAdmin = async(req,res)=>{
+  try {
+    const limit = 15;
+    const page = req.body.page || 1;
+    const skip = (page - 1) * limit;
+   const users = await User.find({isVerify:false},{password:false,token:false}).limit(limit).skip(skip);  
        res.status(200).json({"status":httpsStatus.SUCCESS,"data":users});
    
   } catch (error) {
@@ -232,5 +244,5 @@ const deleteUserAdmin = async(req,res)=>{
 
 }
  module.exports = {
-  registerFunc,loginFunc,sendResetCodeFunc,resetPasswordFunc,confirmAccountFunc,getUserInfo,getAllUsersAdmin,deleteUserAdmin
+  registerFunc,loginFunc,sendResetCodeFunc,resetPasswordFunc,confirmAccountFunc,getUserInfo,getAllUsersVerifyAdmin,getAllUsersNotVerifyAdmin,deleteUserAdmin
  }
